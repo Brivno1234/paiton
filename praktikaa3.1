@@ -1,0 +1,47 @@
+def calculate_from_file(filename="numbers.txt"):
+    try:
+        with open(filename) as file:
+            lines = file.readlines()
+            
+            # Проверка на наличие хотя бы одной пары чисел и операций
+            if len(lines) < 2:
+                print("Ошибка: Файл должен содержать хотя бы одну пару: числа и операция.")
+                return  # Выход из функции, если файл не подходит
+
+            for i in range(0, len(lines), 2):
+                try:
+                    # Чтение чисел из текущей строки
+                    numbers = lines[i].split()
+                    a = int(numbers[0])
+                    b = int(numbers[1])
+                    
+                    # Чтение операции из следующей строки
+                    operation = lines[i + 1].strip()
+                    
+                    # Вычисление результата в зависимости от операции
+                    if operation == "+":
+                        result = a + b
+                    elif operation == "-":
+                        result = a - b
+                    elif operation == "*":
+                        result = a * b
+                    elif operation == "/":
+                        if b == 0:
+                            print(f"Ошибка в строке {i+2}: Деление на ноль!")
+                            continue  # Пропустить эту пару и перейти к следующей
+                        result = a / b
+                    else:
+                        print(f"Ошибка в строке {i+2}: Неподдерживаемая операция!")
+                        continue  # Пропустить эту пару и перейти к следующей
+                    
+                    # Вывод только результата
+                    print(result)
+                
+                except ValueError:
+                    print(f"Ошибка в строке {i+1}: Должно быть два числа.")
+    
+    except FileNotFoundError:
+        print("Ошибка: Файл не найден!")
+
+# Вызов функции
+calculate_from_file()
