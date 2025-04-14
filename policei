@@ -1,0 +1,85 @@
+from datetime import datetime
+
+class PoliceOfficer:
+    def __init__(self, name, badge_number):
+        self.name = name
+        self.badge_number = badge_number
+        self.cases = []
+
+    def assign_case(self, case):
+        self.cases.append(case)
+        print(f"{self.name} badge: {self.badge_number} case_id: {case.case_id}")
+
+    def get_case_by_id(self, case_id):
+        for case in self.cases:
+            if case.case_id == case_id:
+                return case
+        return None
+
+    def get_summary(self):
+        open_cases = sum(1 for case in self.cases if case.status == "open")
+        closed_cases = sum(1 for case in self.cases if case.status == "closed")
+        return {"open_cases": open_cases, "closed_cases": closed_cases}
+
+    def get_info(self):
+        print(f"badge_number: {self.badge_number}")
+        print(f"name: {self.name}")
+        print(f"cases: {self.cases}")
+
+
+class Case:
+    def __init__(self, case_id, description):
+        self.case_id = case_id
+        self.description = description
+        self.status = "open"
+        self.events = []
+
+    def add_event(self, event):
+        if self.status == "closed":
+            print(f"Cannot add event to closed case {self.case_id}.")
+            return
+        self.events.append(event)
+        print(f"Event added to {self.case_id}: {event}")
+
+    def close_case(self):
+        self.status = "closed"
+        print(f"Case {self.case_id} closed.")
+
+    def get_timeline(self):
+        return [str(event) for event in self.events]
+
+    def get_status(self):
+        return self.status
+
+    def get_description(self):
+        return self.description
+
+    def get_case_id(self):
+        return self.case_id
+
+
+class Event:
+    def __init__(self, note, officer_name):
+        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.note = note
+        self.officer_name = officer_name
+
+    def __str__(self):
+        return f"[{self.timestamp}] {self.officer_name}: {self.note}"
+
+
+# Example Usage:
+officer = PoliceOfficer("John", "12")
+officer.get_info()
+
+case1 = Case("C1", "Burglary")
+
+officer.assign_case(case1)
+
+event1 = Event("Event occurred", officer.name)
+case1.add_event(event1)
+
+
+
+
+print(officer.get_summary())
