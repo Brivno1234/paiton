@@ -35,12 +35,9 @@ class Game:
 
     def draw_text(self, screen, msg, y, fsize, color):
         font = pygame.font.Font(None, fsize)
-        lines = msg.split('\n')  # Разбиваем текст на несколько строк по символу новой строки
-        line_height = fsize + 5  # Расстояние между строками
-        for i, line in enumerate(lines):
-            text = font.render(line, True, color)
-            text_rect = text.get_rect(center=(self.w / 2, y + i * line_height))  # Сдвигаем по вертикали для каждой строки
-            screen.blit(text, text_rect)
+        text = font.render(msg, True, color)
+        text_rect = text.get_rect(center=(self.w / 2, y))
+        screen.blit(text, text_rect)
 
     def get_sentence(self):
         try:
@@ -95,7 +92,7 @@ class Game:
 
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.bg, (0, 0))
-        self.draw_text(self.screen, "Typing Speed Test\nPress ENTER to finish", 80, 80, self.HEAD_C)
+        self.draw_text(self.screen, "Typing Speed Test", 80, 80, self.HEAD_C)
 
         pygame.draw.rect(self.screen, (255, 192, 25), (50, 250, 650, 50), 2)
         self.draw_text(self.screen, self.word, 200, 28, self.TEXT_C)

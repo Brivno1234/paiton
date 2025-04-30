@@ -6,16 +6,16 @@ import random
 
 class Game:
     def __init__(self):
-        self.w, self.h = 750, 500
+        self.w = 750
+        self.h = 500
         self.reset = True
         self.active = False
-        self.timer_started = False
         self.input_text = ''
         self.word = ''
         self.time_start = 0
         self.total_time = 0
         self.accuracy = 0
-        self.results = 'Time: 0  Accuracy: 0%  WPM: 0'
+        self.results = 'Time: 0   Accuracy: 0%   Wpm: 0'
         self.wpm = 0
         self.end = False
 
@@ -35,12 +35,9 @@ class Game:
 
     def draw_text(self, screen, msg, y, fsize, color):
         font = pygame.font.Font(None, fsize)
-        lines = msg.split('\n')  # Разбиваем текст на несколько строк по символу новой строки
-        line_height = fsize + 5  # Расстояние между строками
-        for i, line in enumerate(lines):
-            text = font.render(line, True, color)
-            text_rect = text.get_rect(center=(self.w / 2, y + i * line_height))  # Сдвигаем по вертикали для каждой строки
-            screen.blit(text, text_rect)
+        text = font.render(msg, True, color)
+        text_rect = text.get_rect(center=(self.w / 2, y))
+        screen.blit(text, text_rect)
 
     def get_sentence(self):
         try:
@@ -55,14 +52,23 @@ class Game:
         if not self.end:
             self.total_time = time.time() - self.time_start
 
-            correct_chars = sum(1 for i, c in enumerate(self.word)
-                                if i < len(self.input_text) and self.input_text[i] == c)
-            self.accuracy = (correct_chars / len(self.word)) * 100 if self.word else 0
+            input_len = len(self.input_text)
+            word_len = len(self.word)
+            correct_chars = 0
+            for i in range(min(input_len, word_len)):
+                if self.input_text[i] == self.word[i]:
+                    correct_chars += 1
+
+            # Ошибки = пропущенные или лишние символы + неправильные символы
+            errors = abs(word_len - input_len) + (min(word_len, input_len) - correct_chars)
+
+            total_chars = max(word_len, 1)
+            self.accuracy = ((total_chars - errors) / total_chars) * 100
 
             self.wpm = len(self.input_text) * 60 / (5 * self.total_time) if self.total_time > 0 else 0
             self.end = True
 
-            self.results = f'Time: {round(self.total_time)} sec   Accuracy: {round(self.accuracy)}%   WPM: {round(self.wpm)}'
+            self.results = f'Time: {round(self.total_time)} secs   Accuracy: {round(self.accuracy)}%   Wpm: {round(self.wpm)}'
 
             self.time_img = pygame.image.load('icon.png')
             self.time_img = pygame.transform.scale(self.time_img, (150, 150))
@@ -70,6 +76,7 @@ class Game:
 
             pygame.draw.rect(screen, (200, 200, 200), (310, 390, 130, 40), 2)
             self.draw_text(screen, "Reset", self.h - 70, 26, (100, 100, 100))
+
             self.draw_text(screen, self.results, 350, 28, self.RESULT_C)
             pygame.display.update()
 
@@ -80,8 +87,6 @@ class Game:
 
         self.reset = False
         self.end = False
-        self.active = False
-        self.timer_started = False
         self.input_text = ''
         self.word = ''
         self.time_start = 0
@@ -95,7 +100,7 @@ class Game:
 
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.bg, (0, 0))
-        self.draw_text(self.screen, "Typing Speed Test\nPress ENTER to finish", 80, 80, self.HEAD_C)
+        self.draw_text(self.screen, "Typing Speed Test", 80, 80, self.HEAD_C)
 
         pygame.draw.rect(self.screen, (255, 192, 25), (50, 250, 650, 50), 2)
         self.draw_text(self.screen, self.word, 200, 28, self.TEXT_C)
@@ -122,11 +127,9 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONUP:
                     x, y = pygame.mouse.get_pos()
                     if 50 <= x <= 650 and 250 <= y <= 300:
-                        if not self.timer_started:
-                            self.active = True
-                            self.input_text = ''
-                            self.time_start = time.time()
-                            self.timer_started = True
+                        self.active = True
+                        self.input_text = ''
+                        self.time_start = time.time()
 
                     if 310 <= x <= 440 and 390 <= y <= 430 and self.end:
                         self.reset_game()
@@ -139,9 +142,13 @@ class Game:
                         self.input_text = self.input_text[:-1]
 
                     else:
-                        self.input_text += event.unicode
+                        try:
+                            self.input_text += event.unicode
+                        except:
+                            pass
 
             clock.tick(60)
+
 
 if __name__ == "__main__":
     Game().run()
