@@ -1,0 +1,79 @@
+import random
+
+class Level:
+    def __init__(self, level_number, resources=100, min_threshold=30):
+        self.level_number = level_number
+        self.resources = resources
+        self.min_threshold = min_threshold
+        self.alive = True
+
+    def receive_resources(self, amount):
+        self.resources += amount
+
+    def distribute(self):
+        if not self.alive:
+            return 0
+
+        print(f"\nУровень {self.level_number}")
+        print(f"Текущие ресурсы: {self.resources}")
+        print("Выберите, как распределить ресурсы:")
+        print("1. Оставить все себе")
+        print("2. Поделиться (половину себе, половину вниз)")
+        print("3. Передать все вниз")
+
+        while True:
+            choice = input("Ваш выбор (1-3): ")
+            if choice in ['1', '2', '3']:
+                break
+            else:
+                print("Пожалуйста, введите число 1, 2 или 3.")
+
+        if choice == '1':
+            sent = 0
+        elif choice == '2':
+            sent = self.resources // 2
+            self.resources -= sent
+        else:
+            sent = self.resources
+            self.resources = 0
+
+        # Потеря ресурсов при передаче
+        loss = int(sent * 0.2)
+        sent -= loss
+        print(f"Передано ресурсов: {sent}. Потери при передаче: {loss}.")
+        return sent
+
+    def check_survival(self):
+        if self.resources < self.min_threshold:
+            self.alive = False
+            print(f"Уровень {self.level_number} выбыл из игры (мало ресурсов).")
+        else:
+            print(f"Уровень {self.level_number} остался в игре.")
+
+class Game:
+    def __init__(self, levels_count=10):
+        self.levels = [Level(i + 1) for i in range(levels_count)]
+
+    def start(self):
+        print("Игра: Иерархическое управление ресурсами")
+        print("На каждом уровне решается, как распределять ресурсы.\n")
+
+        current_resources = random.randint(100, 200)
+        print(f"Начальные ресурсы: {current_resources}\n")
+
+        for level in self.levels:
+            level.receive_resources(current_resources)
+            current_resources = level.distribute()
+            level.check_survival()
+
+        self.show_results()
+
+    def show_results(self):
+        print("\nРезультаты игры:")
+        for level in self.levels:
+            status = "в игре" if level.alive else "выбыл"
+            print(f"Уровень {level.level_number}: {status}, остаток ресурсов: {level.resources}")
+
+if __name__ == "__main__":
+    game = Game()
+    game.start()
