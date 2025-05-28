@@ -1,0 +1,5 @@
+fail = open("character.txt", "r", encoding="utf-8")
+sisu = fail.read()
+
+print(sisu)
+
