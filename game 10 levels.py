@@ -1,0 +1,80 @@
+import random
+
+class Level:
+    def __init__(self, number, resources=100, min_required=30):
+        self.number = number
+        self.resources = resources
+        self.min_required = min_required
+        self.alive = True
+
+    def add_resources(self, amount):
+        self.resources += amount
+
+    def distribute(self):
+        if not self.alive:
+            print(f"Уровень {self.number} пропускает ход .")
+            return
+
+        print(f"Уровень {self.number}")
+        print(f"Текущие ресурсы: {self.resources}")
+        print("распределить ресурсы:")
+        print("1. Оставить все себе")
+        print("2. Поделиться ")
+        print("3. Передать все ")
+
+        while True:
+            choice = input("выбо 1-3: ")
+            if choice in ['1', '2', '3']:
+                break
+            else:
+                print("введите число 1-3.")
+
+        if choice == '1':
+            sent = 0
+        elif choice == '2':
+            sent = self.resources // 2
+            self.resources -= sent
+        else:
+            sent = self.resources
+            self.resources = 0
+
+        loss = int(sent * 0.2)
+        sent -= loss
+        print(f"Передано ресурсов: {sent}. Потери : {loss}.")
+        return sent
+
+    def check_survival(self):
+        if self.resources < self.min_required:
+            self.alive = False
+            print(f"Уровень {self.number} выбыл из игры .")
+        else:
+            print(f"Уровень {self.number} остался в игре.")
+
+class Game:
+    def __init__(self, count=10):
+        self.levels = [Level(i + 1) for i in range(count)]
+
+    def start(self):
+        current = random.randint(100, 200)
+        print(f"Начальные ресурсы: {current}\n")
+
+        for level in self.levels:
+            level.add_resources(current)
+            result = level.distribute()
+            if result is not None:
+                current = result
+            level.check_survival()
+
+        self.show_results()
+
+    def show_results(self):
+        print("\nРезультаты :")
+        for level in self.levels:
+            if level.alive:
+                status = "в игре"
+            else:
+                status = "выбыл"
+            print(f"Уровень {level.number}: {status}, остаток : {level.resources}")
+
+g = Game()
+g.start()
