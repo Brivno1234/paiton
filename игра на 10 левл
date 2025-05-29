@@ -76,6 +76,6 @@ class Game:
                 status = "выбыл"
             print(f"Уровень {level.number}: {status}, остаток : {level.resources}")
 
-g = Game()
-g.start()
+game = Game()
+game.start()
 
