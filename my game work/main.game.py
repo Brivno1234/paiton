@@ -1,4 +1,4 @@
-#установите в терминале..pygame..sys
+#установите в терминале..pygame..sys .
 
 import pygame
 from pygame.locals import *
